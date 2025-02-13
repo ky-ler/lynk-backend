@@ -1,0 +1,41 @@
+services:
+  postgres:
+    container_name: postgres_lynk
+    image: postgres
+    environment:
+      # TODO: secure user/pass with docker secrets if not on local env
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: verysecurepassword
+      POSTGRES_DB: lynk
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - 8778:5432
+    restart: unless-stopped
+    networks:
+      - lynk
+
+  keycloak:
+    container_name: keycloak_lynk
+    image: quay.io/keycloak/keycloak:26.1
+    ports:
+      - 9090:8080
+    environment:
+      # TODO: secure user/pass with docker secrets if not on local env
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: anotherverysecurepassword
+    networks:
+      - lynk
+    command:
+      - "start-dev"
+
+networks:
+  lynk:
+    driver: bridge
+
+volumes:
+  postgres:
+    driver: local
+  keycloak:
+    driver: local
